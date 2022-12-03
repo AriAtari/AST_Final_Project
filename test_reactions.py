@@ -30,7 +30,6 @@ def Texponent(T,XH,rho,pp_factor,delta=0.0001,):
     return T*(rhigh-rlow)/(Thigh-Tlow)/r
 
 def test_pp():
- 
     rho = 1.0e3
     T = 1.0e7
     f = 1.0
