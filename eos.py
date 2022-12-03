@@ -21,7 +21,7 @@ def mean_molecular_weight(Z,A,X):
     assert np.sum(Xs) == 1.0
     
     # compute value of mean molecular weight
-    mu = 0.0
+    mu = np.sum(Xs*(1+Zs)/As)**(-1)
     return mu
     
 def get_rho_and_T(P,P_c,rho_c,T_c):
