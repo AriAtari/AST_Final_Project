@@ -205,6 +205,6 @@ def pressure_guess(m,mue):
     # beta = 
     # Pguess = (alpha**5/beta**(20/3))*(G**5/Ke**4)*(m*mue**2)**(10/3)
     
-    Pguess = (1/40.09269)*(G**5/Ke**4)*(m*mue**2)**(10/3) # (1/40.09269)*
+    Pguess = (1/40.09269)*(G**5/Ke**4)*(m*mue**2)**(10/3)
     
     return Pguess

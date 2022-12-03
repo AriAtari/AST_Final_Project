@@ -35,7 +35,8 @@ pc = _ac.pc.value
 au = _ac.au.value
 year = _au.year.to(_au.second)
 sigmaSB = _ac.sigma_sb.value
-Ke = (1/5)*(3/(8*(np.pi)))**(2/3)*(ac.h**2/((ac.m_e)*(ac.m_u)**(5/3)))
+mue = 2
+Ke = (1/5)*(3/(8*(np.pi)))**(2/3)*(ac.h**2/((ac.m_e)*(mue*ac.m_u)**(5/3)))
 
 if __name__ == "__main__":
     
