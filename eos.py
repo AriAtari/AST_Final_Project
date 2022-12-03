@@ -40,9 +40,9 @@ def get_rho_and_T(P,P_c,rho_c,T_c):
     Returns
         density, temperature
     """
-
+    
     # replace with computed values
-    rho = 0.0
-    T = 0.0
+    rho = rho_c*(P/P_c)**(3/5)
+    T = T_c*(P/P_c)**(1-3/5)
 
     return rho, T
