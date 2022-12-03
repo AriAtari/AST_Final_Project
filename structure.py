@@ -27,16 +27,13 @@ def central_thermal(m,r,mu):
         Pc, rhoc, Tc
             central pressure, density, and temperature in solar units
     """
-    # fill this in
-    Pc = 0.0
-    rhoc = 0.0
-    Tc = 0.0
+
     
     return Pc, rhoc, Tc
 
 # The following should be modified versions of the routines you wrote for the 
 # white dwarf project
-def stellar_derivatives(m,z,mue):
+def stellar_derivatives(m,z,mue,rate):
     """
     RHS of Lagrangian differential equations for radius and pressure
     
@@ -48,10 +45,13 @@ def stellar_derivatives(m,z,mue):
         mue
             ratio, nucleons to electrons.  For a carbon-oxygen white dwarf, 
             mue = 2.
+        rate
+            the nuclear heating rate per mass unit calculated using
+            the reaction routine pp_rate.
         
     Returns
         dzdm (array)
-            Lagrangian derivatives dr/dm, dP/dm
+            Lagrangian derivatives dr/dm, dP/dm, dL/dm
     """
     
     rho = density(z[1], mue)
@@ -61,12 +61,13 @@ def stellar_derivatives(m,z,mue):
     # evaluate dzdm
     drdm = (4*np.pi*z[0]**2*rho)**(-1)
     dPdm = (-G*m)/(4*np.pi*z[0]**4)
+    dLdm = rate
     
-    dzdm = np.array([drdm, dPdm])
+    dzdm = np.array([drdm, dPdm, dLdm])
     
     return dzdm
 
-def central_values(Pc,delta_m,mue):
+def central_values(Pc,delta_m,mue,mu):
     """
     Constructs the boundary conditions at the edge of a small, constant density 
     core of mass delta_m with central pressure P_c
@@ -84,7 +85,7 @@ def central_values(Pc,delta_m,mue):
             central values of radius and pressure (units =[ m, Pascal])
     """
     
-    # compute initial values of z = [ r, p ]
+    # compute initial values of z = [ r, p, L ]
     
     m = delta_m
     
@@ -92,11 +93,17 @@ def central_values(Pc,delta_m,mue):
     rho = density(P, mue)
     r = ((3*m)/(4*np.pi*rho))**(1/3)
     
-    z = [r, P]
+    central = central_therm(m,r,mu)
+    Tc = central[2]
+    rhoc = central[1]
+    
+    L = delta_m*pp_rate(Tc,rhoc)
+    
+    z = [r, P, L]
     
     return z
     
-def lengthscales(m,z,mue):
+def lengthscales(m,z,mue,R,Teff):
     """
     Computes the radial length scale H_r and the pressure length H_P
     
@@ -104,9 +111,13 @@ def lengthscales(m,z,mue):
         m
             current mass coordinate (units = kg)
         z (array)
-           [ r, p ] (units =[ m, Pascal])
+           [ r, p, L ] (units =[ m, Pascal])
         mue
             mean electron weight
+        R 
+            outer radius of star
+        Teff
+            the calculated effective temperature
     
     Returns
         z/|dzdm| (units =[ m, Pascal ])
@@ -118,7 +129,9 @@ def lengthscales(m,z,mue):
     
     Hp = 4*np.pi*z[0]**4*z[1]/(G*m)
     
-    return np.array([Hr,Hp])
+    HL = 4*np.pi*R**2*sigmaSB*Teff**4
+    
+    return np.array([Hr,Hp,HL])
     
 def integrate(Pc,delta_m,eta,xi,mue,max_steps=10000):
     """
@@ -148,6 +161,7 @@ def integrate(Pc,delta_m,eta,xi,mue,max_steps=10000):
     m_step = np.zeros(max_steps)
     r_step = np.zeros(max_steps)
     p_step = np.zeros(max_steps)
+    L_step = np.zeros(max_steps)
     
     # set starting conditions using central values
     m = delta_m
@@ -156,6 +170,7 @@ def integrate(Pc,delta_m,eta,xi,mue,max_steps=10000):
     for step in range(max_steps):
         radius = z[0]
         pressure = z[1]
+        luminosity = z[2]
         
         # are we at the surface?
         if (pressure < eta*Pc):
@@ -165,12 +180,13 @@ def integrate(Pc,delta_m,eta,xi,mue,max_steps=10000):
         m_step[step] = m
         r_step[step] = z[0]
         p_step[step] = z[1]
+        L_step[step] = z[2]
         
         # set the stepsize
-        h = xi*min(lengthscales(m,z,mue))
+        h = xi*min(lengthscales(m,z,mue,R,Teff))
         
         # take a step
-        z = rk4(stellar_derivatives,m,z,h,mue)
+        z = rk4(stellar_derivatives,m,z,h,mue,R,Teff)
         m += h
         
         # increment the counter
@@ -180,4 +196,4 @@ def integrate(Pc,delta_m,eta,xi,mue,max_steps=10000):
     else:
         raise Exception('too many iterations')
         
-    return m_step[0:Nsteps],r_step[0:Nsteps],p_step[0:Nsteps]
+    return m_step[0:Nsteps],r_step[0:Nsteps],p_step[0:Nsteps],L_step[0:Nsteps]
