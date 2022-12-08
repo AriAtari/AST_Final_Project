@@ -10,15 +10,16 @@ from eos import get_rho_and_T, mean_molecular_weight, density, pressure
 from ode import rk4
 from astro_const import G, Msun, Rsun, Lsun, kB, m_u, fourpi,Ke
 from reactions import pp_rate
+from zams import Teff, surface_luminosity
 
-def central_thermal(m,r,mu):
+def central_thermal(m,R,mu):
     """ 
     Computes the central pressure, density, and temperature from the polytropic
     relations for n = 3/2.
 
     Arguments
         m
-            mass in solar units
+            mass in solar units  total mass
         r
             radius is solar units
         mu
@@ -29,7 +30,6 @@ def central_thermal(m,r,mu):
     """
     # fill this in
     M=m*Msun
-    R=r*Rsun
     Pc = 0.77*G*M**2/R**4
     rhoc = 5.99*(3*M)/(fourpi*R**3)
     Tc = 0.54*((mu*m_u)/kB)*(G*M)/R
@@ -38,7 +38,7 @@ def central_thermal(m,r,mu):
 
 # The following should be modified versions of the routines you wrote for the 
 # white dwarf project
-def stellar_derivatives(m,z,mue,rate):
+def stellar_derivatives(m,z,Teff,rho,mue=2):
     """
     RHS of Lagrangian differential equations for radius and pressure
     
@@ -66,50 +66,55 @@ def stellar_derivatives(m,z,mue,rate):
     # evaluate dzdm
     drdm = (4*np.pi*z[0]**2*rho)**(-1)
     dPdm = (-G*m)/(4*np.pi*z[0]**4)
-    dLdm = rate #############################################
+    dLdm = pp_rate(Teff, rho)
     
     dzdm = np.array([drdm, dPdm, dLdm])
     
     return dzdm
 
-def central_values(Pc,m,delta_m,mue,mu): ##############################################
+def central_values(M,r,delta_m, mu, pp_factor=1.0, mue=2): ##############################################
     """
     Constructs the boundary conditions at the edge of a small, constant density 
     core of mass delta_m with central pressure P_c
     
     Arguments
-        Pc
-            central pressure (units = Pascal)
-        m
-            mass fraction of solar mass for central_thermal
+
+        mue
+            nucleon/electron ratio ?????????
+            
+        M
+            solar mass fraction
+        r
+            total radius given by table???????
         delta_m
             core mass (units = kg)
-        mue
-            nucleon/electron ratio
+        pp_factor 
+            
     
     Returns
-        z = array([ r, p ])
+        z = array([ r, pc ])
             central values of radius and pressure (units =[ m, Pascal])
     """
-    
+     
     # compute initial values of z = [ r, p, L ]
-    
-    
-    P = Pc
-    rho = density(P, mue)
-    r = ((3*delta_m)/(4*np.pi*rho))**(1/3)
-    
-    central = central_thermal(m,r,mu) #######################################
+    central = central_thermal(M,r,mu) ####################################### total mass from table
     Tc = central[2]
     rhoc = central[1]
+    Pc = central[0]
+
+    P = Pc
     
-    L = delta_m*pp_rate(Tc,rhoc)
+    rho = density(Pc, mue) 
+    
+    r = ((3*delta_m)/(4*np.pi*rho))**(1/3)
+    
+    L = delta_m*pp_rate(Tc,rhoc,pp_factor)
     
     z = [r, P, L]
+   
+    return M, z, Pc, rhoc, Tc
     
-    return z
-    
-def lengthscales(m,z,mue,Teff):
+def lengthscales(m,z,Pc,rhoc,T_eff,pp_factor=1.0):
     """
     Computes the radial length scale H_r and the pressure length H_P
     
@@ -118,8 +123,6 @@ def lengthscales(m,z,mue,Teff):
             current mass coordinate (units = kg)
         z (array)
            [ r, p, L ] (units =[ m, Pascal])
-        mue
-            mean electron weight
         R 
             outer radius of star
         Teff
@@ -135,11 +138,11 @@ def lengthscales(m,z,mue,Teff):
     
     Hp = 4*np.pi*z[0]**4*z[1]/(G*m)
     
-    HL = 4*np.pi*z[0]**2*sigmaSB*Teff**4 ##############################################
+    HL = 4*np.pi*z[0]**2*sigmaSB*T_eff**4 ##############################################
     
     return np.array([Hr,Hp,HL])
     
-def integrate(Pc,delta_m,eta,xi,mue,comp,max_steps=10000):
+def integrate(M,r,delta_m,eta,xi,comp,max_steps=10000,pp_factor=1.0):
     """
     Integrates the scaled stellar structure equations
 
@@ -156,7 +159,7 @@ def integrate(Pc,delta_m,eta,xi,mue,comp,max_steps=10000):
             mean electron mass
         comp
             a 2D array of the chemical makeup of the elements in the star which 
-            consists of 1D arrays for Z, A, and X values.
+            consists of 1D arrays for Z, A, and X values.    ###### constant throughout the star
         max_steps
             solver will quit and throw error if this more than max_steps are 
             required (default is 10000)
@@ -166,11 +169,16 @@ def integrate(Pc,delta_m,eta,xi,mue,comp,max_steps=10000):
             arrays containing mass coordinates, radii and pressures during 
             integration (units:[kg,m, Pascal])
     """
-    z = comp[0]
+    
+    z_atom = comp[0]
     a = comp[1]
     x = comp[2]
     
-    mu = mean_molecular_weight(z,a,x)
+    mu = mean_molecular_weight(z_atom,a,x) ##### calc once
+    
+    M, z, rhoc, Tc = central_values(M,r,delta_m, mu, pp_factor=1.0)
+     
+    T_eff = Teff(M)
     
     m_step = np.zeros(max_steps)
     r_step = np.zeros(max_steps)
@@ -179,16 +187,14 @@ def integrate(Pc,delta_m,eta,xi,mue,comp,max_steps=10000):
     
     # set starting conditions using central values
     m = delta_m
-    z = central_values(Pc,delta_m,mue,mu) ############################################
+    
     Nsteps = 0
     for step in range(max_steps):
-        radius = z[0]
-        pressure = z[1]
-        luminosity = z[2]
-        rho = density(pressure, mue)
+#         radius = central_vals[0]
+#         pressure = central_vals[1]
+#         luminosity = central_vals[2]           don't need?
+#         rho = density(pressure, mue)
         
-        Teff = Teff(m)  ###################################################
-        rate = pp_rate(Teff, rho)
         
         # are we at the surface?
         if (pressure < eta*Pc):
@@ -201,10 +207,10 @@ def integrate(Pc,delta_m,eta,xi,mue,comp,max_steps=10000):
         L_step[step] = z[2]
         
         # set the stepsize
-        h = xi*min(lengthscales(m,z,mue,Teff)) ###########################################
+        h = xi*min(lengthscales(m,z,p[step],rhoc,T_eff,pp_factor=1.0)) ########################################### mass coordinate (little m)
         
         # take a step
-        z = rk4(stellar_derivatives,m,z,h,mue,rate) ##################################################
+        z = rk4(stellar_derivatives,m,z,h,args=[T_eff,rhoc]) ################################################## little m
         m += h
         
         # increment the counter
@@ -215,28 +221,6 @@ def integrate(Pc,delta_m,eta,xi,mue,comp,max_steps=10000):
         raise Exception('too many iterations')
         
     return m_step[0:Nsteps],r_step[0:Nsteps],p_step[0:Nsteps],L_step[0:Nsteps]
-
-def pressure_guess(m,mue):
-    """
-    Computes a guess for the central pressure based on virial theorem and mass-
-    radius relation. 
-    
-    Arguments
-        m
-            mass of white dwarf (units are ?)
-        mue
-            mean electron mass
-    
-    Returns
-        P
-            guess for pressure
-    """
-    Pguess = (1/40.09269)*(G**5/Ke**4)*(m*mue**2)**(10/3) ##################################
-    
-    return Pguess
-
-
-
 
 
 
