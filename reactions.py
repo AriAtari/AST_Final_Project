@@ -1,5 +1,5 @@
 # 
-# <Team name, members go here>
+#Team Spectacular Stellars: Arian Andalib, Ashley Stone, Jonathan Kho, Emma Oswald
 # 
 
 import numpy as np
