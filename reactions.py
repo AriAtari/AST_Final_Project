@@ -4,7 +4,7 @@
 
 import numpy as np
 
-def pp_rate(T,rho,XH,pp_factor=1.0):
+def pp_rate(T,rho,XH= 0.7,pp_factor=1.0):
     """
     Specific heating rate from pp chain hydrogen burning. Approximate rate 
     taken from Hansen, Kawaler, & Trimble.
@@ -21,5 +21,6 @@ def pp_rate(T,rho,XH,pp_factor=1.0):
     """
     
     # fill this out
-    rate = pp_factor
+    rate = pp_factor*((2.4e-3*rho*XH**2)/(T*1e-9)**(2/3)*np.exp(-3.380/(T*1e-9)**(1/3)))
     return rate
+

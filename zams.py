@@ -11,16 +11,25 @@ def Teff(Mwant):
     """
     Interpolates effective temperatures given mass from tabulated [1] values 
     for low-mass stars.
+<<<<<<< HEAD
 
     [1] Chabrier, Baraffe, Allard, and Hauschildt. Evolutionary Models for Very 
     Low-Mass Stars and Brown Dwarfs with Dusty Atmospheres. Astrophys. Jour. 
     542:464--472, Oct. 2000.
 
+=======
+    [1] Chabrier, Baraffe, Allard, and Hauschildt. Evolutionary Models for Very 
+    Low-Mass Stars and Brown Dwarfs with Dusty Atmospheres. Astrophys. Jour. 
+    542:464--472, Oct. 2000.
+>>>>>>> origin/Emma
     Parameters
         Mwant (float, scalar or array)
             Mass of the star(s) in units of solar masses
     Returns
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/Emma
        Teff (float, same type/shape as Mwant)
             Interpolated effective temperatures of the stars in Kelvin.
     """
@@ -43,5 +52,9 @@ def surface_luminosity(Teff,radius):
     """
     
     # fill this in
+<<<<<<< HEAD
     luminosity = 4*np.pi*R**2*sigmaSB*Teff**4
+=======
+    luminosity = 4*np.pi*radius**2*sigmaSB*Teff**4
+>>>>>>> origin/Emma
     return luminosity
