@@ -1,7 +1,7 @@
 """ 
 Routines for computing structure of fully convective star of a given mass and 
 radius.
-<Team name, members go here>
+Team Spectacular Stellars: Arian Andalib, Ashley Stone, Jonathan Kho, Emma Oswald
 """
 
 import numpy as np
@@ -46,13 +46,13 @@ def stellar_derivatives(m,z,P_c,rho_c,T_c,pp_factor): # mu?
             current value of the mass
         z (array)
             current values of (radius, pressure, luminsity)
-        mue
-            ratio, nucleons to electrons.  For a carbon-oxygen white dwarf, 
-            mue = 2.
-        rate
-            the nuclear heating rate per mass unit calculated using
-            the reaction routine pp_rate.
         
+        P_c, rho_c, T_c
+            central pressure, density, and temperature in solar units
+        
+        pp_factor 
+            multiplicative factor for rate
+            
     Returns
         dzdm (array)
             Lagrangian derivatives dr/dm, dP/dm, dL/dm
@@ -79,11 +79,11 @@ def central_values(M,R,delta_m,mu, pp_factor=1.0): # P_c,rho_c,T_c?
         M
             solar mass fraction
         r
-            total radius given by table???
+            solar radius fraction
         delta_m
             core mass (units = kg)
         pp_factor 
-            
+            multiplicative factor for rate
     
     Returns
         z = array([ r, pc ])
@@ -108,12 +108,16 @@ def lengthscales(m,z,Pc,rhoc,Tc,pp_factor=1.0):
     Arguments
         m
             current mass coordinate (units = kg)
+            
         z (array)
            [ r, p, L ] (units =[ m, Pascal])
-        R 
-            outer radius of star
-        Teff
-            the calculated effective temperature
+           
+        P_c, rho_c, T_c
+            central pressure, density, and temperature in solar units
+            
+        pp_factor 
+            multiplicative factor for rate 	
+        
     
     Returns
         z/|dzdm| (units =[ m, Pascal ])
@@ -135,8 +139,11 @@ def integrate(M,r,delta_m,eta,xi,comp,max_steps=10000,pp_factor=1.0):
     """
     Integrates the scaled stellar structure equations
     Arguments
-        Pc
-            central pressure (units = Pascal)
+        M
+            current mass coordinate (units = kg)
+        r
+            current radius coordinate (units = m)
+
         delta_m
             initial offset from center (units = kg)
         eta
@@ -151,7 +158,9 @@ def integrate(M,r,delta_m,eta,xi,comp,max_steps=10000,pp_factor=1.0):
         max_steps
             solver will quit and throw error if this more than max_steps are 
             required (default is 10000)
-                        
+        pp_factor 
+            multiplicative factor for rate 	                        
+               
     Returns
         m_step, r_step, p_step
             arrays containing mass coordinates, radii and pressures during 

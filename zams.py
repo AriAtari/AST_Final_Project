@@ -1,6 +1,6 @@
 """
 Routines for computing the zero-aged main-sequence for low-mass stars.
-<team name, members go here>
+Team Spectacular Stellars: Arian Andalib, Ashley Stone, Jonathan Kho, Emma Oswald
 """
 
 import numpy as np

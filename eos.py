@@ -1,7 +1,7 @@
 """
 Routines to compute an adiabatic equation of state.
 
-<Team name, members go here>
+Team Spectacular Stellars: Arian Andalib, Ashley Stone, Jonathan Kho, Emma Oswald
 """
 
 import astro_const as ac
