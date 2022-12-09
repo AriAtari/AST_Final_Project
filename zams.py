@@ -4,7 +4,7 @@ Routines for computing the zero-aged main-sequence for low-mass stars.
 """
 
 import numpy as np
-from astro_const import fourpi, sigmaSB
+from astro_const import fourpi, sigmaSB, Rsun
 
 def Teff(Mwant):
     """
@@ -39,5 +39,7 @@ def surface_luminosity(Teff,radius):
     """
     
     # fill this in
-    luminosity = 4*np.pi*radius**2*sigmaSB*Teff**4
+    
+    R = radius*100 #covert to cm for cgs
+    luminosity = 4*np.pi*(R)**2*sigmaSB*Teff**4
     return luminosity
