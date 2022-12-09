@@ -67,7 +67,7 @@ def stellar_derivatives(m,z,mue):
     
     return dzdm
 
-def central_values(Pc,delta_m,mue):
+def central_values(m,r,delta_m,pp_factor):
     """
     Constructs the boundary conditions at the edge of a small, constant density 
     core of mass delta_m with central pressure P_c
@@ -121,7 +121,7 @@ def lengthscales(m,z,mue):
     
     return np.array([Hr,Hp])
     
-def integrate(Pc,delta_m,eta,xi,mue,max_steps=10000):
+def integrate(m,r,delta_m,eta,xi,pp_factor,max_steps=10000):
     """
     Integrates the scaled stellar structure equations
 
