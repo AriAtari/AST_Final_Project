@@ -21,20 +21,20 @@ from test_reactions import *
 from test_structure import *
 from test_zams import *
 
-# test_chem()
-# print("chemistry passed testing")
+test_chem()
+print("chemistry passed testing")
 
-# test_adiabat()
-# print("adiabatic EOS passed testing")
+test_adiabat()
+print("adiabatic EOS passed testing")
 
-# test_pp()
-# print("reactions passed testing")
+test_pp()
+print("reactions passed testing")
 
-# test_central_thermal()
-# print("central temperature passed testing")
+test_central_thermal()
+print("central temperature passed testing")
 
-# test_Teff()
-# print("effective temperature passed testing")
+test_Teff()
+print("effective temperature passed testing")
 
 test_surface_luminosity()
 print("surface luminosity passed testing")
