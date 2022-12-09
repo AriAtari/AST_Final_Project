@@ -127,7 +127,7 @@ def lengthscales(m,z,Pc,rhoc,Tc,pp_factor=1.0):
     
     Hp = 4*np.pi*z[0]**4*z[1]/(G*m)
     
-    HL = 4*np.pi*z[0]**2*sigmaSB*T**4 ##########s
+    HL = 4*np.pi*z[0]**2*sigmaSB*T**4 
     
     return np.array([Hr,Hp,HL])
     
