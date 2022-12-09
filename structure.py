@@ -37,7 +37,7 @@ def central_thermal(m,r,mu):
 
 # The following should be modified versions of the routines you wrote for the 
 # white dwarf project
-def stellar_derivatives(m,z,P_c,rho_c,T_c): # mu?
+def stellar_derivatives(m,z,P_c,rho_c,T_c,pp_factor): # mu?
     """
     RHS of Lagrangian differential equations for radius and pressure
     
@@ -64,7 +64,7 @@ def stellar_derivatives(m,z,P_c,rho_c,T_c): # mu?
     # evaluate dzdm
     drdm = (4*np.pi*z[0]**2*rho)**(-1)
     dPdm = (-G*m)/(4*np.pi*z[0]**4)
-    dLdm = pp_rate(T, rho)
+    dLdm = pp_rate(T, rho,pp_factor)
     dzdm = np.array([drdm, dPdm, dLdm])
     
     return dzdm
@@ -164,7 +164,7 @@ def integrate(M,r,delta_m,eta,xi,comp,max_steps=10000,pp_factor=1.0):
     
     mu = mean_molecular_weight(z_atom,a,x) ##### calc once
     
-    M, z, Pc, rhoc, Tc = central_values(M,r,delta_m, mu, pp_factor=1.0)
+    M, z, Pc, rhoc, Tc = central_values(M,r,delta_m, mu, pp_factor)
      
     T_eff = Teff(M)
     
@@ -194,10 +194,10 @@ def integrate(M,r,delta_m,eta,xi,comp,max_steps=10000,pp_factor=1.0):
         L_step[step] = z[2]
         
         # set the stepsize
-        h = xi*min(lengthscales(m,z,z[1],rhoc,Tc,pp_factor=1.0)) ################ mass coordinate (little m)
+        h = xi*min(lengthscales(m,z,z[1],rhoc,Tc,pp_factor)) ################ mass coordinate (little m)
         
         # take a step
-        z = rk4(stellar_derivatives,m,z,h,args=(Pc,rhoc,Tc)) #################### little m,
+        z = rk4(stellar_derivatives,m,z,h,args=(Pc,rhoc,Tc,pp_factor)) #################### little m,
         m += h
         
         # increment the counter
