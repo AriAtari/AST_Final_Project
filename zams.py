@@ -40,6 +40,7 @@ def surface_luminosity(Teff,radius):
     
     # fill this in
     
-    R = radius*100 #covert to cm for cgs
+    # R = radius*100 #covert to cm for cgs
+    R = radius
     luminosity = 4*np.pi*(R)**2*sigmaSB*Teff**4
     return luminosity

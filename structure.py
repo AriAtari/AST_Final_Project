@@ -37,7 +37,7 @@ def central_thermal(m,r,mu):
 
 # The following should be modified versions of the routines you wrote for the 
 # white dwarf project
-def stellar_derivatives(m,z,P_c,rho_c,T_c,pp_factor):
+def stellar_derivatives(m,z,P_c,rho_c,T_c,pp_factor): # mu?
     """
     RHS of Lagrangian differential equations for radius and pressure
     
@@ -64,7 +64,7 @@ def stellar_derivatives(m,z,P_c,rho_c,T_c,pp_factor):
     # evaluate dzdm
     drdm = (4*np.pi*z[0]**2*rho)**(-1)
     dPdm = (-G*m)/(4*np.pi*z[0]**4)
-    dLdm = pp_rate(T, rho,pp_factor)
+    dLdm = pp_rate(T, rho,pp_factor = pp_factor)
     dzdm = np.array([drdm, dPdm, dLdm])
     
     return dzdm
@@ -86,8 +86,12 @@ def central_values(M,R,delta_m,mu, pp_factor=1.0): # P_c,rho_c,T_c?
             multiplicative factor for rate
     
     Returns
-        z = array([ r, pc ])
-            central values of radius and pressure (units =[ m, Pascal])
+        M
+            solar mass fraction
+        z
+            initial values of (radius, pressure, luminsity)
+        Pc, rhoc, Tc
+            central pressure, density, and temperature in solar units
     """
      
     # compute initial values of z = [ r, p, L ]
@@ -95,7 +99,7 @@ def central_values(M,R,delta_m,mu, pp_factor=1.0): # P_c,rho_c,T_c?
     
     r = ((3*Msun*delta_m)/(4*np.pi*rhoc))**(1/3)
     
-    L = Msun*delta_m*pp_rate(Tc,rhoc,pp_factor)
+    L = Msun*delta_m*pp_rate(Tc,rhoc,pp_factor = pp_factor)
     
     z = [r, Pc, L]
    
