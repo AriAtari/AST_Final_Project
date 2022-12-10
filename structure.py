@@ -37,7 +37,7 @@ def central_thermal(m,r,mu):
 
 # The following should be modified versions of the routines you wrote for the 
 # white dwarf project
-def stellar_derivatives(m,z,P_c,rho_c,T_c,pp_factor): # mu?
+def stellar_derivatives(m,z,P_c,rho_c,T_c,pp_factor):
     """
     RHS of Lagrangian differential equations for radius and pressure
     
