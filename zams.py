@@ -34,13 +34,12 @@ def surface_luminosity(Teff,radius):
     Photospheric luminosity [W]
     
     Arguments
-        Teff [K]
-        radius [m]
+        Teff [K]: Effective temperature of star
+        radius [m]: Radius of star's surface
+    Returns
+        luminosity: Luminosity from star's surface
     """
     
     # fill this in
-    
-    # R = radius*100 #covert to cm for cgs
-    R = radius
-    luminosity = 4*np.pi*(R)**2*sigmaSB*Teff**4
+    luminosity = 4*np.pi*(radius)**2*sigmaSB*Teff**4
     return luminosity

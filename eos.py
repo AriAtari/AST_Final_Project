@@ -6,7 +6,6 @@ Team Spectacular Stellars: Arian Andalib, Ashley Stone, Jonathan Kho, Emma Oswal
 
 import astro_const as ac
 import numpy as np
-import astro_const as ac
 
 def mean_molecular_weight(Z,A,X):
     """Computes the mean molecular weight for a fully ionized plasma with an
@@ -16,6 +15,8 @@ def mean_molecular_weight(Z,A,X):
         Z, A, X (either scaler or array)
             charge numbers, atomic numbers, and mass fractions
             The mass fractions must sum to 1
+    Returns
+        mu: mean molecular weight for given composition
     """
     Zs = np.array(Z)
     As = np.array(A)
@@ -40,7 +41,8 @@ def get_rho_and_T(P,P_c,rho_c,T_c):
             gas EOS
 
     Returns
-        density, temperature
+        density [kg m^-3]
+        temperature [K]
     """
 
     # replace with computed values

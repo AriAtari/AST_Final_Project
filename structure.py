@@ -69,7 +69,7 @@ def stellar_derivatives(m,z,P_c,rho_c,T_c,pp_factor): # mu?
     
     return dzdm
 
-def central_values(M,R,delta_m,mu, pp_factor=1.0): # P_c,rho_c,T_c?
+def central_values(M,R,delta_m,mu, pp_factor=1.0):
     """
     Constructs the boundary conditions at the edge of a small, constant density 
     core of mass delta_m with central pressure P_c
@@ -78,10 +78,12 @@ def central_values(M,R,delta_m,mu, pp_factor=1.0): # P_c,rho_c,T_c?
     
         M
             solar mass fraction
-        r
+        R
             solar radius fraction
         delta_m
             core mass (units = kg)
+        mu
+            mean molecular weight
         pp_factor 
             multiplicative factor for rate
     
@@ -120,11 +122,11 @@ def lengthscales(m,z,Pc,rhoc,Tc,pp_factor=1.0):
             central pressure, density, and temperature in solar units
             
         pp_factor 
-            multiplicative factor for rate 	
+            multiplicative factor for rate
         
     
     Returns
-        z/|dzdm| (units =[ m, Pascal ])
+        z/|dzdm| = [Hr,Hp,HL] (units =[ m, Pascal ])
     """
 
     # fill this in
@@ -154,8 +156,6 @@ def integrate(M,r,delta_m,eta,xi,comp,max_steps=10000,pp_factor=1.0):
             The integration stops when P < eta * Pc
         xi
             The stepsize is set to be xi*min(p/|dp/dm|, r/|dr/dm|)
-        mue
-            mean electron mass
         comp
             a 2D array of the chemical makeup of the elements in the star which 
             consists of 1D arrays for Z, A, and X values.    ###### constant throughout the star
@@ -163,12 +163,12 @@ def integrate(M,r,delta_m,eta,xi,comp,max_steps=10000,pp_factor=1.0):
             solver will quit and throw error if this more than max_steps are 
             required (default is 10000)
         pp_factor 
-            multiplicative factor for rate 	                        
+            multiplicative factor for rate                       
                
     Returns
-        m_step, r_step, p_step
-            arrays containing mass coordinates, radii and pressures during 
-            integration (units:[kg,m, Pascal])
+        m_step, r_step, p_step, L_step
+            arrays containing mass coordinates, radii, pressures, and luminosities during 
+            integration (units:[kg,m,Pascal,W])
     """
     
     z_atom = comp[0]

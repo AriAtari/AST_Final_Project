@@ -13,7 +13,7 @@ def pp_rate(T,rho,XH= 0.7,pp_factor=1.0):
         T, rho
             temperature [K] and density [kg/m**3]
         XH
-            mass fraction hydrogen
+            mass fraction of hydrogen
         pp_factor
             multiplicative factor for rate
     Returns
